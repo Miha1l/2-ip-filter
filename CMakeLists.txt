@@ -23,17 +23,21 @@ target_include_directories(ip_filter
 
 if(WITH_BOOST_TEST)
     find_package(Boost COMPONENTS unit_test_framework REQUIRED)
-    # add_executable(test_ip_filter test_ip_filter.cpp)
+    add_executable(test_ip_filter test_ip_filter.cpp ip_filter.cpp)
 
-    # set_target_properties(test_ip_filter PROPERTIES
-    #     CXX_STANDARD 17
-    #     CXX_STANDARD_REQUIRED ON
-    # )
+    set_target_properties(test_ip_filter PROPERTIES
+        CXX_STANDARD 17
+        CXX_STANDARD_REQUIRED ON
+    )
 
-    # set_target_properties(test_ip_filter PROPERTIES
-    #     COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
-    #     INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR}
-    # )
+    set_target_properties(test_ip_filter PROPERTIES
+        COMPILE_DEFINITIONS BOOST_TEST_DYN_LINK
+        INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR}
+    )
+
+    target_link_libraries(test_ip_filter
+        ${Boost_LIBRARIES}
+    )
 endif()
 
 if (MSVC)
@@ -41,21 +45,21 @@ if (MSVC)
         /W4
     )
 
-    # if(WITH_BOOST_TEST)
-    #     target_compile_options(test_version PRIVATE
-    #         /W4
-    #     )
-    # endif()
+    if(WITH_BOOST_TEST)
+        target_compile_options(test_ip_filter PRIVATE
+            /W4
+        )
+    endif()
 else ()
     target_compile_options(ip_filter PRIVATE
         -Wall -Wextra -pedantic -Werror
     )
 
-    # if(WITH_BOOST_TEST)
-    #     target_compile_options(test_version PRIVATE
-    #         -Wall -Wextra -pedantic -Werror
-    #     )
-    # endif()
+    if(WITH_BOOST_TEST)
+        target_compile_options(test_ip_filter PRIVATE
+            -Wall -Wextra -pedantic -Werror
+        )
+    endif()
 endif()
 
 install(TARGETS ip_filter RUNTIME DESTINATION bin)
@@ -69,5 +73,6 @@ include(CPack)
 
 if(WITH_BOOST_TEST)
     enable_testing()
-    add_test(test_filter test_filter)
+    add_test(test_filter test_ip_filter)
+    add_test(test_filter_any test_ip_filter)
 endif()
