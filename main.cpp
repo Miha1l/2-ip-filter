@@ -5,35 +5,25 @@
 #include <vector>
 #include <string>
 
-std::vector<std::string> split(const std::string &str, char d) {
-    std::vector<std::string> r;
+std::vector<IPv4Addr> read(std::istream &in) {
+    std::vector<IPv4Addr> ip_pool;
 
-    size_t start = 0;
-    size_t stop = str.find_first_of(d);
-    while (stop != std::string::npos) {
-        r.push_back(str.substr(start, stop - start));
-
-        start = stop + 1;
-        stop = str.find_first_of(d, start);
+    for (std::string line; std::getline(in, line);) {
+        auto tab_pos = line.find('\t');
+        std::string_view ip_str = std::string_view(line).substr(0, tab_pos);
+        IPv4Addr ip;
+        if (parse_ip_from_string(ip_str, ip)) {
+            ip_pool.push_back(ip);
+        }
     }
 
-    r.push_back(str.substr(start));
-
-    return r;
+    return ip_pool;
 }
 
 int main(int, char**) {
     try
     {
-        std::vector<IPv4Addr> ip_pool;
-
-        for (std::string line; std::getline(std::cin, line);) {
-            std::vector<std::string> v = split(line, '\t');
-            IPv4Addr ip;
-            if (parse_ip_from_string(v.at(0), ip)) {
-                ip_pool.push_back(ip);
-            }
-        }
+        std::vector<IPv4Addr> ip_pool = read(std::cin);
 
         // reverse lexicographically sort
         std::sort(ip_pool.begin(), ip_pool.end(), [](const IPv4Addr &ip1, const IPv4Addr &ip2) {

@@ -17,9 +17,11 @@ std::vector<IPv4Addr> filter_any(const std::vector<IPv4Addr> &ip_pool, uint8_t v
 
 template <typename... Args>
 std::vector<IPv4Addr> filter(const std::vector<IPv4Addr> &ip_pool, Args... args) {
-    size_t count = sizeof...(args);
+    const size_t count = sizeof...(args);
+    static_assert(count > 0, "filter needs at least 1 argument");
     uint8_t values[] = { static_cast<uint8_t>(args)... };
     std::vector<IPv4Addr> filtered_ips;
+    filtered_ips.reserve(ip_pool.size());
     std::copy_if(ip_pool.begin(), ip_pool.end(), std::back_inserter(filtered_ips), [&](const auto &ip) {
         return std::equal(ip.begin(), ip.begin() + count, values);
     });

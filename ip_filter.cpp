@@ -37,6 +37,7 @@ bool parse_ip_from_string(std::string_view ip_str, IPv4Addr &ip_out) {
 
 std::vector<IPv4Addr> filter_any(const std::vector<IPv4Addr> &ip_pool, uint8_t value) {
     std::vector<IPv4Addr> filtered_ips;
+    filtered_ips.reserve(ip_pool.size());
     std::copy_if(ip_pool.begin(), ip_pool.end(), std::back_inserter(filtered_ips), [&](const auto &ip) {
         return std::find(ip.begin(), ip.end(), value) != ip.end();
     });
